@@ -15,6 +15,8 @@
 	<properties>
 		<!-- Stand-alone RESTFul application for testing only -->
 		<start-class>io.pivotal.microservices.services.Main</start-class>
+		<docker-maven-plugin.version>0.3.8</docker-maven-plugin.version>
+		<docker.image.prefix>mmiglier</docker.image.prefix>
 	</properties>
 
 	<dependencies>
@@ -73,6 +75,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>web</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -81,6 +84,30 @@
 					<execution>
 						<goals>
 							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>${docker-maven-plugin.version}</version>
+				<configuration>
+					<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
 						</goals>
 					</execution>
 				</executions>
